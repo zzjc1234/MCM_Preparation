@@ -110,3 +110,7 @@ Author: Zhaojiacheng Zhou
 ---
 
 ### Interpreting the Clusters
+
+- Parallel Coordinates(平行坐标图)  
+    显示不同聚类在各个变量下的观测值
+
