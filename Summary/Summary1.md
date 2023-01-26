@@ -26,7 +26,7 @@ Author: Zhaojiacheng Zhou
 
   - 详细说明
     - CMD  
-      CMD通常需要先计算观察值（observations）的成对距离（pairwise distance）从而生成相异度向量（dissimilarity vector)再计算重构后的矩阵（记重构后的矩阵为x）以及x*x'的本征值e。可以使用本征值e来确定对x中的点的低维近似是否提供了数据的合理表示。如果前p个特征值显著大于其余的特征值，则这些点被前p维(即x的前p列)很好地近似
+      CMD通常需要先计算观察值（observations）的成对距离（pairwise distance）从而生成相异度向量（dissimilarity vector)再计算重构后的矩阵（记重构后的矩阵为x）以及x*x'的本征值e。可以使用本征值e来确定对x中的点的低维近似是否提供了数据的合理表示。如果帕累托图中显示前p个特征值显著大于其余的特征值，则这些点被前p维(即x的前p列)很好地近似
     - PCA  
       PCA主成分分析的机理主要是是将原来很多具有相关性的一系列指标(p个指标)重新组合成一组较少个数的互不相关的综合指标来代替原来的指标。利用挑选的一组合适的权重来得到一个原随机变量的主成分[[link](https://anl.sjtu.edu.cn/mcm/docs/name/主成分分析PCA)]
 
@@ -47,3 +47,4 @@ Author: Zhaojiacheng Zhou
 ---
 
 ### k-Means Clustering
+
