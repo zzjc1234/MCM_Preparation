@@ -9,6 +9,7 @@ Author: Zhaojiacheng Zhou
 ## Menu
 
 1. Low Dimensional Visualization
+2. k-Means Clustering
 
 ---
 
@@ -29,7 +30,7 @@ Author: Zhaojiacheng Zhou
     - PCA  
       PCA主成分分析的机理主要是是将原来很多具有相关性的一系列指标(p个指标)重新组合成一组较少个数的互不相关的综合指标来代替原来的指标。利用挑选的一组合适的权重来得到一个原随机变量的主成分[[link](https://anl.sjtu.edu.cn/mcm/docs/name/主成分分析PCA)]
 
-      重要参数：  
+      - 重要参数：  
         1. 原始数据：m行（观察值）n列（变量）
         2. Principal component coefficients(主成分系数）：p*p矩阵，每一列包含一个主成分相关系数。
         3. Principal component scores（主成分得分）：
@@ -39,3 +40,10 @@ Author: Zhaojiacheng Zhou
         [[link2](T-squared-Test.pdf)]
         6. explained（解释方差占总方差的百分比）:Percentage of the total variance explained by each principal component
         7. mu(估计的均值):Estimated means of the variables in input data
+      - 应用：  
+        1. 使用explained（解释方差占总方差的百分比）绘制 Pareto chart（帕累托图）以判断哪几个principle component的contribution比较大，确定后续研究对象
+        2. 确定研究的principle component之后绘制散点图或者运用聚类进行分类
+
+---
+
+### k-Means Clustering
