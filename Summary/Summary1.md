@@ -31,11 +31,11 @@ Author: Zhaojiacheng Zhou
 
       重要参数：  
         1. 原始数据：m行（观察值）n列（变量）
-        2. Principal component coefficients(主成分系数）：p*p矩阵，每一列包含一个主成分的系数。
+        2. Principal component coefficients(主成分系数）：p*p矩阵，每一列包含一个主成分相关系数。
         3. Principal component scores（主成分得分）：
         4. Principal component variances（主成分方差）：
         5. Hotelling’s T-Squared Statistic（霍特林T$^2$统计量）: A statistical measure of the multivariate distance of each observation from the center of the data set.
         [[link1](https://online.stat.psu.edu/stat505/lesson/7/7.1/7.1.15)]
         [[link2](T-squared-Test.pdf)]
-        7. Percentage of the total variance explained by each principal component:
-        8. Estimated means of the variables in input data:
+        6. explained（解释方差占总方差的百分比）:Percentage of the total variance explained by each principal component
+        7. mu(估计的均值):Estimated means of the variables in input data
