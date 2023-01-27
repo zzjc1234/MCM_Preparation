@@ -114,3 +114,8 @@ Author: Zhaojiacheng Zhou
 - Parallel Coordinates(平行坐标图)  
     显示不同聚类在各个变量下的观测值
 
+- Cross-Tabulation(交叉表)
+  - Intro  
+    在一些数据集中，观测值已经有了与之相关的类别。可以使用Cross-Tabulation(交叉表)来研究原始类别之间的集群分布
+- Heatmap（热力图）
+  - 可视化数据（eg.可视化cross table中的数据）
