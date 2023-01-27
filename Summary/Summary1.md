@@ -13,6 +13,7 @@ Author: Zhaojiacheng Zhou
 3. Gaussian Mixture Models
 4. k-means VS GMM
 5. Interpreting the Clusters
+6. Hierarchical Clustering
 
 ---
 
@@ -65,6 +66,8 @@ Author: Zhaojiacheng Zhou
   - 选择合适的测度(option: `"Distance"`)
   - 初始化簇中心时，选择合适的值(option: `"Start"`)
   - 以不同的簇中心，多次计算(option:`"Replicate"`)
+
+---
 
 ### Gaussian Mixture Models
 
@@ -119,3 +122,31 @@ Author: Zhaojiacheng Zhou
     在一些数据集中，观测值已经有了与之相关的类别。可以使用Cross-Tabulation(交叉表)来研究原始类别之间的集群分布
 - Heatmap（热力图）
   - 可视化数据（eg.可视化cross table中的数据）
+
+- Silhouette Plots(轮廓图)
+  - Intro  
+    在使用聚类技术(如k-means和高斯混合模型)时，必须指定聚类的数量。然而，对于高维数据，很难确定最佳簇数。  
+    可以使用轮廓值来判断集群的质量。一个观测值的轮廓值是一个标准化的度量(介于-1和+1之间)，用于与不同聚类中的观测值相比，该观测值与同一聚类中的其他观测值的接近程度
+
+    轮廓图显示每个观测的轮廓值，按聚类分组。大多数观测值具有高廓形值的聚类方案是可取的，即正值面积越大越合理
+  - `evalclusters` function  
+    - Example：
+
+    ```matlab
+    %try the k value from 2 to 5, evaluate with sihouette plot
+    clustev = evalclusters(X,"kmeans","silhouette","KList",2:5)
+    ```
+
+---
+
+### Hierarchical Clustering
+
+- Function `linkage`  
+  使用Function `linkage`创建层次树。  
+  可选的第二个和第三个输入指定了计算集群之间距离(默认为“single”)和计算点之间距离(默认为“euclidean”)的方法。
+
+- Function `dendrogram`  
+  可以使用树状图函数来可视化层次结构。
+
+- 应用
+  可以根据链接距离Z使用聚类函数将观测值分配到组中
