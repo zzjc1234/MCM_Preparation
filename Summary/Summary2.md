@@ -12,6 +12,11 @@ Author: Zhaojiacheng Zhou
 2. Classification Learner App
 3. k Nearest Neighbor Classification
 4. Classification Trees
+5. Naive Bayes Classification
+6. Discriminant Analysis
+7. Support Vector Machines
+8. Multiclass Support Vector Machines
+9. Neural Networks
 
 ---
 
@@ -102,3 +107,141 @@ Author: Zhaojiacheng Zhou
 - Tips
 
     当有大量数据丢失时，树是一个很好的选择
+
+---
+
+### Naive Bayes Classification
+
+- Intro
+
+  kNN模型和决策树对底层数据的分布不做任何假设。
+
+  如果我们假设数据集来自底层分布，我们可以将数据视为统计样本。这可以减少异常值对模型的影响。
+
+  朴素贝叶斯分类器假设每个类中的predictor是独立的。对于相对简单的问题，这个分类器是一个很好的选择。
+
+- 重点
+  - 用数据集生成先验概率，再计算后验概率。通过后验概率确定数据属于哪个聚类
+
+- 优点
+
+    根据模型的分布会计算出一个准确的概率而不是如knn决策树等算法一般做近似处理，多余噪声等因素抗干扰性强
+
+- 局限
+
+    要求变量独立，如果变量有相互关联则可信度以及效果可能不理想。
+
+---
+
+### Discriminant Analysis
+
+- Intro
+
+  与朴素贝叶斯相似，判别分析的工作原理是假设每个预测类别中的观测值可以用正态概率分布建模。然而，每个预测器都不存在独立假设。因此，每个类都拟合了多元正态分布。
+
+- 算法思想
+
+  - 判别分析使用训练集决定preditor之间的边界的位置。
+
+  - 判别分析将训练集中的观测值视为多维正态分布中的样本。
+
+  - 用n维正态分布拟合一个类中的观测值。这涉及到为每个类计算均值向量和协方差矩阵。这决定了分布的中心和形状。
+  - 拟合分布后，可以根据概率相同的点画出类别之间的边界
+
+- 重要参数
+  - 判别类型：线性or二元
+  - 在线性边界中包含预测因子的系数阈值
+  - 用于估计线性DA的协方差矩阵的正则化
+  
+- Tips：  
+  线性判别分析适用于“广泛”数据(预测因子多于观测值)
+
+- 优势
+
+  抗噪声能力强
+
+---
+
+### Support Vector Machines
+
+- Intro
+
+  支持向量机是一种二元分类的算法，通过寻找分离所有数据点的“最佳”超平面来对数据进行分类
+
+- 算法思想
+
+  对每一种可能的超平面，我们将它进行平移，直到它与空间中的样本向量相交。我们称这两个向量为支持向量，之后我们计算支持向量到该超平面的距离d，分类效果最好的超平面应该使d最大。
+
+- 分类
+  - 线性可分
+    - 寻找最优分类超平面，即离两类所有的观察值距离最远的线
+  - 线性不可分
+    - 软间隔
+      - 设置容错率
+    - 硬间隔
+      - 寻找合适的核函数
+
+- 重要参量
+  - 数据集
+  - 间隔类型
+  - 容错率
+  - 核函数
+  - 核函数应用前的放缩
+  - 归一化方式
+
+---
+
+### Multiclass Support Vector Machines
+
+- Intro
+
+  支持向量机是针对二元分类的算法，multiclass支持向量机在支持向量机的基础上创建error-correcting output codes (ECOC)分类器从而达到处理多个分类
+
+- 创建步骤
+
+  1. 创建二元分类模版
+  2. 创建MSVM model
+
+- 重要参数
+
+  与SVM相同
+
+---
+
+### Neural Networks
+
+- Intro
+
+  神经网络通过一组连接的神经元模拟人脑的行为。这些网络通过反复试验来调整神经元之间的连接，从而学会识别模式。
+
+  这种方法不对数据做任何假设。但是它要求数据是规范化的。
+
+- 算法
+
+  - 分层
+    - Input Layer(输入层): One for each predictor variable
+    - Hidden Layer(处理层)
+    - Output Layer(输出层) : One for each reponse class
+
+  - 流程
+    1. 输入
+    2. 输入层中每一个节点将信息传递给每一个处理层节点
+    3. 根据数据的权重（神经元连接强度？）计算加权平均，并作为节点方程的输入
+    4. 处理层中每一个节点将信息传递给每一个输出层节点
+    5. 计算加权平均并带入方程
+    6. 输出结果（一般[0,1]区间）
+
+  - 训练正反馈神经网络
+    - 分割数据集
+
+      通过将数据集分割为训练集和验证集来防止神经网络过拟合，最后通过测试集合来评估模型
+
+  - 重要参数
+    - Layer Size：层节点个数
+    - Activation：每个充分连接的层的activation function
+    - Validation Data：验证集
+    - Validation Patience: 遭遇连续无法提升模型质量，停止迭代的次数
+
+  - Tips
+
+    Neural networks work well for "tall" data (more observations than predictors).
