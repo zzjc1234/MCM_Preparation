@@ -11,5 +11,7 @@
 !Onramp/*.png
 !Summary/
 !Summary/*.md
-!Summary/*.pdf
-!Summary/*.png
+!Summary/src
+!Summary/src/*.png
+!Summary/src/*.jpg
+!Summary/src/*.pdf

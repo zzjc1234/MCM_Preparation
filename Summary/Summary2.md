@@ -24,7 +24,7 @@ Author: Zhaojiacheng Zhou
 
 - Typical machine learning workflow
 
-![workflow](matlabMLflow.png)
+![workflow](src/matlabMLflow.png)
 
 ---
 

@@ -41,7 +41,7 @@ Author: Zhaojiacheng Zhou
         4. Principal component variances（主成分方差）：
         5. Hotelling’s T-Squared Statistic（霍特林T$^2$统计量）: A statistical measure of the multivariate distance of each observation from the center of the data set.
         [[link1](https://online.stat.psu.edu/stat505/lesson/7/7.1/7.1.15)]
-        [[link2](T-squared-Test.pdf)]
+        [[link2](src/T-squared-Test.pdf)]
         6. explained（解释方差占总方差的百分比）:Percentage of the total variance explained by each principal component
         7. mu(估计的均值):Estimated means of the variables in input data
       - 应用：  
