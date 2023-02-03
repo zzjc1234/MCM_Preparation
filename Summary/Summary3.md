@@ -13,6 +13,7 @@ Author: Zhaojiacheng Zhou
 3. Reducing Predictors - Feature Transformation
 4. Reducing Predictors - Feature Selection
 5. Feature Ranking Algorithms
+6. Sequential Feature Selection
 
 ---
 
@@ -174,6 +175,8 @@ Author: Zhaojiacheng Zhou
   partLoss=kfoldLoss(mdlPart);
   ```
 
+  ---
+
 ### Feature Ranking Algorithms
 
 - Intro
@@ -229,3 +232,35 @@ Author: Zhaojiacheng Zhou
   partLoss = kfoldLoss(mdlPart)
   confusionchart(T.faultCode, kfoldPredict(mdlPart))
   ```
+
+  ---
+
+### Sequential Feature Selection
+
+- Intro
+
+  顺序特征选择是一种可以用于任何学习算法的特征选择方法。
+
+  顺序特征选择是一个迭代过程，给定一个特定的预测模型，依次添加和删除预测变量，然后评估对模型质量的影响。
+
+- 流程
+
+  1. 顺序特征选择需要一个误差函数来构建模型并计算预测误差。
+
+  ![seq1](src/Sequential1.png)
+
+  2. 这个过程首先建立模型，并使用其中一个预测因子计算误差。
+
+  ![seq2](src/Sequential2.png)
+
+  3. 添加第二个预测因子并再次计算误差。
+
+  ![seq3](src/Sequential3.png)
+
+  4. 添加第二个预测因子并再次计算误差。如果误差减小，则保留第二个预测因子。只要误差减小，就会向模型中添加更多的预测因子。
+
+  ![seq4](src/Sequential4.png)
+
+- Grammar
+
+
