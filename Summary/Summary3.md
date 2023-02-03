@@ -12,6 +12,7 @@ Author: Zhaojiacheng Zhou
 2. Cross Validation
 3. Reducing Predictors - Feature Transformation
 4. Reducing Predictors - Feature Selection
+5. Feature Ranking Algorithms
 
 ---
 
@@ -147,3 +148,84 @@ Author: Zhaojiacheng Zhou
 ### Reducing Predictors - Feature Selection
 
 - Intro
+
+  数据集通常包含与响应没有任何关系的预测因子。例如，医疗数据集可能包含患者ID号，但此ID与正在研究的医疗状况没有任何关系。ID不应该包含在模型中，但模型会像对待其他预测因子一样对待它。
+
+  数据集也可能包含高度相关的预测因子，模型中只需要包含其中一个预测因子。
+
+  特征选择技术可以帮助选择要包含在模型中的预测因子子集。
+
+  ![feature1](src/introImage.png)
+
+- 应用
+  - 决策树内置特征选择方法
+    - Grammar:
+
+        predictorImportance(treemodel)
+
+- Sample Code
+
+  ```matlab
+  mdl=fitctree(T,"faultCode");
+  p=predictorImportance(mdl);
+  toKeep=p>0.001;
+  selected = T(:,[toKeep true]);
+  mdlPart=fitctree(selected,"faultCode","KFold",5);
+  partLoss=kfoldLoss(mdlPart);
+  ```
+
+### Feature Ranking Algorithms
+
+- Intro
+  - 特征排名算法根据特征与模型的相关性，根据给定的度量标准，为特征分配分数。一些常用的算法包括卡方算法、最小冗余最大相关性算法(MRMR)和邻域成分分析算法。
+
+- 应用
+
+  使用`fs__`函数将特征排序算法应用于数据。大多数特征排序算法返回所有特征从高到低排序的位置和分数。
+
+- Sample Code
+
+  ```matlab
+  [idx,scores] = fs__(tblData,ResponseVarName)
+  ```
+
+- Inputs
+
+  |tblData|Table data with predictor variables and a response variable.|
+  |---|---|
+  |ResponseVarName|Name of the response variable.|
+
+- Outputs
+
+  |idx|Indices of predictors ordered by predictor importance.|
+  |---|---|
+  |scores|Predictor scores.|
+
+- 应用
+
+  1. 使用`fs__`获取索引
+  2. 使用线性索引来选择特征的子集
+  3. 使用子集来训练模型
+
+- Feature ranking algorithms in MATLAB
+
+  |Algorithm|Function|Task|
+  |---|---|---|
+  |Chi-Square|fscchi2|Classification|
+  |Minimum redundancy maximum relevance (MRMR)|fscmrmr/fsrmrmr|Classification/Regression|
+  |Neighborhood component analysis (NCA)|fscnca/fsrnca|Classification/Regression|
+  |F-tests|fsrftest|Regression|
+  |Laplacian|fsulaplacian|Clustering|
+  |ReliefF/RRelief|relieff|Classification/Regression|
+
+- Sample Code
+
+  ```matlab
+  [idx,scores]=fscchi2(T,"faultCode");
+  bar(idx,scores);
+  toKeep = idx(1:15);
+  selected = T(:,[toKeep,end]);
+  mdlPart = fitctree(selected,"faultCode","KFold",5);
+  partLoss = kfoldLoss(mdlPart)
+  confusionchart(T.faultCode, kfoldPredict(mdlPart))
+  ```
