@@ -14,6 +14,8 @@ Author: Zhaojiacheng Zhou
 4. Reducing Predictors - Feature Selection
 5. Feature Ranking Algorithms
 6. Sequential Feature Selection
+7. Accommodating Categorical Data
+8. Hyperparameter Optimization
 
 ---
 
@@ -263,4 +265,96 @@ Author: Zhaojiacheng Zhou
 
 - Grammar
 
+  - 使用Function `sequentialfs`
 
+  ```matlab
+  toKeep = sequentialfs(fun,X,y)
+  ```
+  
+  - Outputs
+    |toKeep|Logical vector indicating which predictors are included in the final model|
+    |---|---|
+
+  - Inputs
+    |fun|	Function handle for a function that fits a model and calculates the loss.|
+    |---|---|
+    |X|Numeric matrix with m observations and n predictors.|
+    |Y|Numeric vector of m response values.|
+
+  - Tips
+    - fun是error function的句柄
+    - 以使用可选属性“cv”来指定交叉验证方法
+
+  - Structure of the Error Function
+
+    序列特征选择需要一个误差函数来构建模型并计算预测误差。错误函数必须具有以下结构：
+    
+    - 四个输入变量
+      - 两个训练变量
+      - 两个评价变量
+    - 表示预测误差的一个标量输出
+
+- Sample Code for error function
+
+  ```matlab
+  function error = errorFun(Xtrain,ytrain,Xtest,ytest)
+  
+  % Create the model with the learning method of your choice     
+  mdl = fitcsvm(Xtrain,ytrain);
+  
+  % Calculate the number of test observations misclassified
+  ypred = predict(mdl,XTest);
+  error = nnz(ypred ~= ytest);
+  
+  end
+  ```
+
+- Sample Code for `sequentialfs`
+
+  ```matlab
+  ferror = @(XTrain,yTrain,XTest,yTest) nnz(yTest ~= predict(fitcknn(XTrain,yTrain),XTest));
+  toKeep = sequentialfs(ferror,predictors,data.bin)
+  ```
+
+### Accommodating Categorical Data
+
+- Intro
+
+  一些算法和功能(例如，sequentialfs)需要数值矩阵形式的预测因子。如果数据包含分类预测因子，如何在模型中包含这些预测因子?
+
+  一种选择是为每个类别分配一个数字。然而，这可能会对观测结果造成错误的数值结构。
+
+  例如，假设你将数字1到4分配到预测因子中的四个类别。这意味着类别1和类别4之间的距离是类别3和类别4之间距离的三倍。实际上，这些类别之间的距离可能是相等的。
+
+  一个更好的方法是创建新的虚拟预测因子，每个类别有一个虚拟预测因子。
+
+- Function `dummyvar`
+
+  可以使用`dummyvar`函数创建一个虚拟变量矩阵,eg.
+
+  ```matlab
+  d = dummyvar(c) 
+  ```
+
+  d的每一列表示c中的一个类别。每行对应一个观察值，其中有一个元素值为1，其他元素均为0。1出现在与该观察值的指定类别对应的列中。
+
+  这个矩阵现在可以在机器学习模型中使用，取代分类向量c，每一列都被视为一个单独的预测变量，表明该类别c的存在(1)或不存在(0)。
+
+  ![dummyvar](src/dummyvarImage.png)
+
+- Sample Code
+
+  ```matlab
+  dvGrit=dummyvar(data.grit);
+  predictors = [data{:,1:4} dvGrit];
+  ferror = @(XTrain,yTrain,XTest,yTest) nnz(yTest ~= predict(fitcknn(XTrain,yTrain),XTest));
+  toKeep = sequentialfs(ferror,predictors,data.bin)
+  mdlPart = fitcknn(predictors(:,toKeep),data.bin,"KFold",7);
+  partLoss = kfoldLoss(mdlPart)
+  ```
+
+---
+
+### Hyperparameter Optimization
+
+- Intro
