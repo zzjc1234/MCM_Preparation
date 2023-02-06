@@ -17,6 +17,8 @@ Author: Zhaojiacheng Zhou
 7. Accommodating Categorical Data
 8. Hyperparameter Optimization
 9. Fitting Ensemble Models
+10. Project1
+11. Project2
 
 ---
 
@@ -236,7 +238,7 @@ Author: Zhaojiacheng Zhou
   confusionchart(T.faultCode, kfoldPredict(mdlPart))
   ```
 
-  ---
+---
 
 ### Sequential Feature Selection
 
@@ -316,6 +318,8 @@ Author: Zhaojiacheng Zhou
   ferror = @(XTrain,yTrain,XTest,yTest) nnz(yTest ~= predict(fitcknn(XTrain,yTrain),XTest));
   toKeep = sequentialfs(ferror,predictors,data.bin)
   ```
+
+---
 
 ### Accommodating Categorical Data
 
@@ -505,8 +509,90 @@ Author: Zhaojiacheng Zhou
 
   mdlEns2=fitcensemble(T,"faultCode","Method","Bag","NumLearningCycles",30,"CVPartition",cvpt);
   lossEns2=kfoldLoss(mdlEns2);
-  
+
   tmdl=templateTree("NumVariablesToSample",15,"Prune","on");
   mdlEns3=fitcensemble(T,"faultCode","Learners",tmdl,"CVPartition",cvpt);
   lossEns3=kfoldLoss(mdlEns3);
   ```
+
+---
+
+### Project1
+
+- Background
+
+  The table redData contains several features of red wine and the corresponding quality, which is saved in the QCLabel variable
+
+- Target
+
+  Reduce the number of predictors in redData. You may use feature selection and/or feature transformation.
+
+  Create a cross-validated model of any type with the reduced data. Name the model mdl, and calculate the loss mdlLoss.
+
+  Try different models to see if you can get the loss value below 0.45, that of the full quadratic discriminant analysis model.
+
+  Feature Selection
+
+  ```matlab
+  tModel = fitctree(redData,"QCLabel");
+  p = predictorImportance(tModel);
+
+  % View predictor importance on a bar plot
+  bar(p)
+  xticklabels(redData.Properties.VariableNames(1:end-1))
+  xtickangle(60)
+
+  % Sort out the top predictors
+  [~,iSorted] = sort(p);
+  selected = [iSorted(1:6) width(redData)];
+
+  % Create tree model to reduced data
+  mdl = fitctree(redData(:,selected),"QCLabel","KFold",7);
+  mdlLoss = kfoldLoss(mdl)
+  ```
+
+  PCA
+
+  ```matlab
+  [pcs,scrs,~,~,pexp] = pca(redData{:,1:end-1});
+  pareto(pexp)
+
+  % Create k-NN model to reduced data
+  mdl = fitcknn(scrs(:,1:3),redData.QCLabel,"KFold",7);
+  mdlLoss = kfoldLoss(mdl)
+  ```
+
+---
+
+### Project2
+
+- Background
+
+- Task1
+
+  - Target
+
+    Create a reduced data set with three or fewer predictor variables. You may use feature selection and/or feature transformation. Then, create a seven-fold cross-validated tree model named mdl and calculate the loss, mdlLoss.
+
+  - Code
+    ```matlab
+    p=predictorImportance(fitctree(creditRatings,"Rating"));
+    [~,sorted]=sort(p);
+    selected=[sorted(1:3),width(creditRatings)];
+    cvpt=cvpartition(creditRatings.Rating,"KFold",7);
+    mdl=fitctree(creditRatings(:,selected),"Rating","CVPartition",cvpt);
+    mdlLoss=kfoldLoss(mdl);
+    ```
+
+- Task2
+
+  - Target
+
+    Create an ensemble of 50 seven-fold cross-validated classification trees using the bag method. Create your model with three or fewer predictors selected from the previous task. Name the ensemble mdlEns. Calculate the loss and name it lossEns.
+
+  - Code
+
+    ```matlab
+    mdlEns=fitcensemble(creditRatings(:,selected),"Rating","Method","Bag","NumLearningCycles",50,"CVPartition",cvpt);
+    lossEns=kfoldLoss(mdlEns);
+    ```
