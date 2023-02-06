@@ -49,6 +49,8 @@ Author: Zhaojiacheng Zhou
     mdl = fitlm(data,"modelspec")
     ```
 
+    ![reg](srtc/../src/regressionEquation2.png)
+
 - Inputs
 
     |data|A table containing the data used to fit the regression model. See below for details.|
@@ -64,7 +66,7 @@ Author: Zhaojiacheng Zhou
 
     fitlm的第一个输入是一个包含预测因子和对应值。默认情况下，fitlm使用最后一列作为对应值，所有其他列作为预测因子
 
-    在对线性回归建模时，可以对预测变量应用不同的函数。作为fitlm的第二个输入，您可以使用一个预定义模型，也可以通过提供Wilkinson-Rogers表示法的公式来指定一个模型。
+    在对线性回归建模时，可以对预测变量应用不同的函数。作为fitlm的第二个输入，可以使用一个预定义模型，也可以通过提供Wilkinson-Rogers表示法的公式来指定一个模型。
 
 - Quiz
 
@@ -90,16 +92,47 @@ Author: Zhaojiacheng Zhou
 
 - Sample Code
 
-- Basic
+  - Basic
+
+      ```matlab
+      mdl = fitlm(dataTrain,"quadratic","RobustOpts","on")
+      yPred = predict(mdl,dataTest);
+      ```
+
+  - Modify the code so that mdl fits a model where the response Y is a function of X1, X1^2, and X3.
+
+      ```matlab
+      mdl=fitlm(dataTrain,"Y~X1+X1^2+X3");
+      yPred=predict(mdl,dataTest);
+      ```
+
+- Specify the Regression Model
+
+    预测矩阵X的每一列都被视为一个预测变量。默认情况下，fitlm将为每个预测器(列)拟合一个具有截距和线性项的模型。
+
+    要拟合不同的回归公式有两个选择。
+    1. 可以将预测器和响应存储在一个表中，并分别提供模型规范。
+    2. 可以为回归公式中的每个项创建一个带有列的矩阵。这个矩阵叫做设计矩阵。
+
+    ![Specify](src/tableVsArraySyntax.png)
+
+  - Sample Code for Design Matrix
 
     ```matlab
-    mdl = fitlm(dataTrain,"quadratic","RobustOpts","on")
-    yPred = predict(mdl,dataTest);
+    XTrain13 = [XTrain(:,1),XTrain(:,3),XTrain(:,1).*XTrain(:,3)];
+    dl13 = fitlm(XTrain13,yTrain)
     ```
 
-- Modify the code so that mdl fits a model where the response Y is a function of X1, X1^2, and X3.
+  - Visualize the Result
+
+    使用函数`evaluateFit`可视化模型
 
     ```matlab
-    mdl=fitlm(dataTrain,"Y~X1+X1^2+X3");
-    yPred=predict(mdl,dataTest);
+    mdl = fitlm(carTrain,"RobustOpts","cauchy");
+    econPred = predict(mdl,carTest);
+    evaluateFit(carTest.FuelEcon,econPred,"Linear Model")
     ```
+
+    ![pic](src/regression_visualization.png)
+
+---
