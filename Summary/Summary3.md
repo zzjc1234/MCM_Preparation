@@ -16,6 +16,7 @@ Author: Zhaojiacheng Zhou
 6. Sequential Feature Selection
 7. Accommodating Categorical Data
 8. Hyperparameter Optimization
+9. Fitting Ensemble Models
 
 ---
 
@@ -358,3 +359,154 @@ Author: Zhaojiacheng Zhou
 ### Hyperparameter Optimization
 
 - Intro
+
+  我们可以修改机器学习模型的属性，以尝试提高模型性能。
+
+  例如，可以将一个kNN模型更改为使用5个最近邻而不是1个，然后计算新模型的损失。
+
+  该过程通常包括用各种属性值反复训练模型，并选择产生最佳精度的组合
+
+  这些属性通常被称为超参数。超参数对模型的性能有很大的影响，但是找到最优的超参数值通常很耗时或很困难。
+
+  为了一次有效地设置所有属性，可以执行超参数优化。超参数优化允许选择模型属性的子集，并为特定的数据集找到最佳设置。
+ 
+- 使用
+
+  可以使用“OptimizeHyperparameters”属性名-值对来选择要优化的模型属性。大多数模型创建函数接受“OptimizeHyperparameters”选项
+
+  eg.
+
+  ```matlab
+  mdl = fitcknn(data,"ResponseName","OptimizeHyperparameters",params)
+  ```
+
+  - Inputs
+
+    |data,"ResponseName"|Table of predictors and response values and response variable name.|
+    |---|---|
+    |"OptimizeHyperparameters"|Optional property for hyperparameter optimization.|
+    |params|Model properties to optimize, specified as a string array or cell array. Using "auto" and "all" optimizes pre-selected properties.|
+
+  - Outputs
+
+    mdl: Model fit using optimized property values.
+
+  - Tips
+
+    在优化过程中，会显示迭代更新，并显示出最佳目标函数值与迭代次数的关系图
+
+    eg.
+
+    ```matlab
+    mdl = fitcknn(data,"y","OptimizeHyperparameters","auto")
+    ```
+
+    ![optimal](src/objectiveFunction.png)
+
+    将“OptimizeHyperparameters”属性值设置为“auto”将优化一组典型的超参数。优化的属性因模型类型而异。例如，对于最近邻分类，优化的属性是“距离”和“NumNeighbors”。
+
+  - 超参选项
+
+    默认情况下，超参数优化使用贝叶斯优化，并尽量减少5倍的交叉验证损失。可以使用“HyperparameterOptimizationOptions”属性名称-值对更改这些设置。
+
+    使用结构指定优化选项。若要使用10倍交叉验证，请创建一个交叉验证分区，然后创建一个包含选项名称-值对的结构。
+
+    ```matlab
+    part = cvpartition(y,"KFold",10);
+    opt = struct("CVPartition",part);
+    mdl = fitcknn(data,"y","OptimizeHyperparameters","auto","HyperparameterOptimizationOptions",opt);
+    ```
+
+    可以在结构中设置许多优化选项。例如，可以隐藏图形并设置目标函数计算的最大数量。
+
+    ```matlab
+    opt = struct("ShowPlots",false,"MaxObjectiveEvaluations",50); 
+    ```
+
+  - Sample Code
+
+    ```matlab
+    cvpt = cvpartition(dataTrain.faultCode,"KFold",10);
+    opt = struct("CVPartition",cvpt,"MaxObjectiveEvaluations",25);
+    ```
+
+---
+
+### Fitting Ensemble Models
+
+- Intro
+
+  一些机器学习方法被认为是弱学习模型，这意味着它们对用于训练它们的数据高度敏感。
+
+  ![ensemble1](src/tree1.png)
+
+  例如，决策树是弱学习模型;两组略有不同的训练数据可以产生两棵完全不同的树，从而产生不同的预测。
+
+  但是，可以通过创建几棵树(或者按照类似的命名，称为森林)的集合来利用这一弱点。然后，新的观测结果可以应用到所有的树上，并对所得到的预测进行比较。
+
+  ![ensemble2](src/tree2.png)
+
+- Grammar
+
+  fitcensemble函数创建了弱学习器的分类集合。类似地，fitrensemble函数创建回归集成。两个函数具有相同的语法。
+
+  ```matlab
+  mdl = fitcensemble(data,"ResponseName")
+  ```
+
+  - Inputs
+
+    |data|Table containing the predictors and response values.|
+    |---|---|
+    |"ResponseName"|Response variable name.|
+
+  - Outputs
+
+    |mdl|Ensemble model variable.|
+    |---|---|
+
+  - Commonly Used Options
+    - "Method" - Bagging (bootstrap aggregation)和boosting是集成建模中最常用的两种方法。fitcensemble函数提供了几种装袋和增强方法。例如，使用“Bag”方法创建一个随机森林。
+
+      ```matlab
+      mdl - fitcensemble(data,"Y","Method","Bag")
+      ```
+
+      默认方法取决于它是二元还是多类分类问题，以及集成中的学习器类型
+
+    - "Learners" - 可以指定在集成中使用的弱学习器类型:“tree”、“discriminant”或“knn”。默认学习器类型取决于指定的方法:方法“Subspace”有默认学习器“knn”，所有其他方法都有默认学习器“tree”。
+
+      ```matlab
+      mdl = fitcensemble(data,"Y","Learners","knn")
+      ```
+
+      函数`fitcensemble`使用每种学习器类型的默认设置。要自定义学习器属性，请使用弱学习器模板
+
+      ```matlab
+      mdl = fitcensemble(data,"Y","Learners",templateKNN("NumNeighbors",3))
+      ```
+
+      可以使用学习器的单元向量来创建由多种类型的学习器组成的集合。例如，一个集成可以由两种类型的kNN学习器组成。
+
+      ```matlab
+      lnrs = {templateKNN("NumNeighbors",3),templateKNN("NumNeighbors",5)}
+      mdl = fitcensemble(data,"Y","Learners",lnrs)
+      ```
+
+    - NumLearningCycles" - 在每个学习周期中，为“learner”中指定的每个学习器训练一个弱学习器。默认学习周期数为100。如果“Learners”只包含一个学习器(通常情况下)，那么默认情况下会训练100个学习器。如果“Learners”包含两个学习器，那么默认情况下训练200个学习器(每个学习周期两个学习器)。
+
+- Sample Code
+
+  ```matlab
+  cvpt = cvpartition(T.faultCode,"KFold",5);
+
+  mdlEns=fitcensemble(T,"faultCode","Method","Bag");
+  lossEns=resubLoss(mdlEns)
+
+  mdlEns2=fitcensemble(T,"faultCode","Method","Bag","NumLearningCycles",30,"CVPartition",cvpt);
+  lossEns2=kfoldLoss(mdlEns2);
+  
+  tmdl=templateTree("NumVariablesToSample",15,"Prune","on");
+  mdlEns3=fitcensemble(T,"faultCode","Learners",tmdl,"CVPartition",cvpt);
+  lossEns3=kfoldLoss(mdlEns3);
+  ```
