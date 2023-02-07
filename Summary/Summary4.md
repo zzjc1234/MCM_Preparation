@@ -260,3 +260,142 @@ Author: Zhaojiacheng Zhou
 
   - Ridge and Lasso Regression
 
+    在线性回归中，系数由最小化均方误差(MSE)选择。均方误差是观测值与预测响应值之间的差的平方。
+
+    ![RL_reg1](src/RL_reg1.png)
+
+    在ridge和lasso回归中，在MSE中加入一个惩罚项。
+
+    该惩罚项由拟合系数值和调整参数λ组成。λ的值越大，惩罚就越大，因此，系数就越“缩小”到零
+
+    ![RL_reg2](src/RL_reg2.png)
+
+  - 惩罚项
+
+    这两种方法的不同之处在于惩罚期限的计算方式。岭回归使用系数的L2范数。Lasso使用L1范数。
+
+    使用不同的规范可以提供不同的正则化行为。
+
+    岭回归不断缩小系数，并保持所有的预测。  
+    Lasso允许将系数设置为零，从而减少模型中包含的预测因子的数量。
+
+    Lasso可以用作特征选择的一种形式，但是特征选择可能不适用于具有相似的、高度相关的变量的情况。这可能会导致信息丢失，从而影响结果的准确性和解释。岭回归保持了所有的特征，但如果有大量的预测因子，模型可能仍然非常复杂。
+
+  - 弹性网
+
+    还可以使用两者加权平均值的惩罚项。这是弹性净回归，它引入了另一个参数-岭回归(L$_2$范数)和Lasso回归(L$_1$范数)之间的加权
+
+  - Grammar of Ridge Regression Models
+
+    使用函数`ridge`来拟合岭回归模型
+
+    ```matlab
+    b = ridge(y,X,lambda,scaled)
+    ```
+
+    ![syntax_ridge](src/arraySyntaxImage.png)
+    - Inputs
+
+      |y|Response values, specified as a vector.|
+      |---|---|
+      |X|Predictor values, specified as a numeric matrix.|
+      |lambda|Regularization parameter.|
+      |scaled|A {0,1}-valued flag to determine if the coefficient estimates in b are restored to the scale of the original data.|
+
+    - Outputs
+
+      |b|Ridge regression coefficients.|
+      |---|---|
+
+    - Notes
+
+      - 矩阵X是一个数值设计矩阵，列表示回归公式中的项。如果原始数据包含两个预测变量x1和x2，但所需的回归模型公式包含术语x1、x2和x1*x2，则矩阵X应该有3列:x1、x2和x1*x2。
+      - `ridge`的参数`lambda`是非负数。在后面的部分中，您将尝试估计`lambda`的最佳值。
+      - `ridge`拟合模型之前将对预测因子进行归一化。因此，默认情况下，回归系数对应归一化数据。将`scaled`标志设置为0以将系数恢复到原始数据的比例
+
+  - Predicting Response using Ridge Regression Models
+
+    当使用岭回归模型进行预测时，将需要原始数据尺度内的回归系数。在这种情况下(缩放标志设置为0)，系数向量b将包含n+1个具有n个预测因子的模型系数。b的第一个元素对应截距项。
+
+    可以通过将包含预测因子和系数向量的最后n个元素的矩阵相乘来预测对应值。加上系数向量的第一个元素，将截距纳入计算。
+
+    ![predRidge](src/ridgePrediction.png)
+
+  - 选择lambda
+
+    当向岭函数提供λ值的向量时，输出b是一个系数矩阵。
+
+    ```matlab
+    b = ridge(y,X,lambda,scaling);
+    ```
+
+    b的列包含向量lambda中每个参数的系数值。
+
+    ![RidgeLambda](src/lambdaAndB.png)
+
+    可以使用矩阵b的每一列作为回归系数并预测对应值
+
+    ```matlab
+    yPred = dataNew*b(2:end,:) + b(1,:);
+    ```
+
+    ![Ridgepred](src/lambdaVectorPrediction.png)
+
+    对应值yPred是一个矩阵，其中每一列都是对应lambda值的预测响应。可以使用yPred来计算均方误差(MSE)，并选择使MSE最小化的系数。
+
+  - Sample Code for Ridge
+
+    ```matlab
+    lambda=0:100;
+    b = ridge(yTrain,XTrain,lambda,0);
+    plot(lambda,b)
+    yPred=XTest*b(2:end,:)+b(1,:);
+    err = yPred - yTest;
+    mdlMSE = mean(err.^2);
+    plot(lambda,mdlMSE)
+    xlabel("\lambda")
+    ylabel("MSE")
+    [minMSE,idx]=min(mdlMSE)
+    ```
+
+  - Grammar for Lasso Regression Models
+
+    ```matlab
+    [b,fitInfo] = lasso(X,y,"Lambda",lambda)
+    ```
+
+    - Inputs
+
+      |X|Predictor values, specified as a numeric matrix.|
+      |---|---|
+      |y|Response values, specified as a vector.|
+      |"Lambda"|Property name for specifying the regularization parameter.|
+      |lambda|Regularization parameter value.|
+
+    - Outputs
+
+      |b|Lasso coefficients.|
+      |---|---|
+      |fitInfo|A structure containing information about the model.|
+
+    - Notes
+
+      与ridge一样，矩阵X是一个设计矩阵，列表示回归公式中的项。
+
+      “Lambda”属性是可选的。如果未指定，Lasso使用的基于数据的$\lambda$等比数列。
+
+      Ridge和lasso执行它们的惩罚条件略有不同，因此，对lambda使用不同的缩放。要使用lasso中的λ值，其解释与岭回归的λ值相同，请将lasso中的λ按观测次数缩放。
+
+      使用值在0到1之间的可选属性“Alpha”创建弹性网。弹性净回归使用的惩罚项是脊(L2)和lasso(L1)惩罚项的加权平均值。接近1的“Alpha”值更接近lasso，接近0的“Alpha”值更接近山脊。
+
+  - Predicting Response using Lasso Model
+
+    以通过将包含预测因子的矩阵乘以系数向量来预测响应。
+
+    请注意，截距项不包括在输出系数中。相反，它是输出结构fitInfo中的一个字段。
+
+    ```matlab
+    yPred = dataNew*b + fitInfo.Intercept
+    ```
+
+
