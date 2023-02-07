@@ -482,3 +482,67 @@ Author: Zhaojiacheng Zhou
 
   ![GPR_Intro](src/GPR_Intro.png)
 
+  GPR将GMM的中数字的分布概率延伸至方程的分布概率
+
+  当我们对一个n维正态分布取样，我们会得到n个数。通常我们会把这些数据视为n维空间中的一个点。但是我们也认为它们是一个方程在n个点上的采样取得的值
+
+  如果我们让n的值变得越来越大，我们就可以更好地分辨函数。
+
+  理论上，方程是一个在无限维空间中的一个点。但一个极大的n足够我们解决实际问题
+
+  在无限维空间上的一个点可以用由一个期望向量和一个协方差矩阵决定的概率分布采样。相似的，我们可以通过由期望向量方程和一个协方差方程决定的概率分布
+
+  GPR中协方差方程是由一个选定的核函数决定的。该核函数描述了一个点对另一个点有多大的影响。这有效的决定了分布中方程的光滑程度。
+
+  在获得一组点的情况下，我们可以通过选择分布参数，用一个概率分布来拟合这些点，使得分布的属性匹配数据的属性
+
+  类似的，在获得一组方程值的情况下，我们可以用一个非常接近给定方程值的方程概率分布来拟合。我们可以获得期望和置信区间。这不仅给出了回归方程，还给出了预测的概率边界
+
+- Grammar
+
+  ```matlab
+  mdl = fitrgp(data,"ResponseVarName")
+  ```
+
+  - Inputs
+
+    |data|A table containing the predictor and response values.|
+    |---|---|
+    |"ResponseVarName"|Name of the response variable.|
+
+  - Outputs
+
+    |mdl|A GPR model variable.|
+    |---|---|
+
+  - Predicting the Response
+
+    除了预测的响应值，GPR模型的预测函数还可以返回预测值的标准差和预测区间
+
+    ```matlab
+    [yPred,yStd,yInt] = predict(mdl,dataNew)
+    ```
+
+    yPred: Predicted response value(s).  
+    yStd: Standard deviation for each predicted value.  
+    yInt: Matrix whose columns contain the lower and upper limits of the 95% prediction interval for each predicted value.
+
+    以通过将“Alpha”属性设置为0到1之间的值来更改预测间隔的显著水平。默认值为0.05
+
+    ```matlab
+    [yPred,yStd,yInt] = predict(mdl,dataNew,"Alpha",0.01)
+    ```
+
+- Sample Code
+
+  ```matlab
+  mdl = fitrgp(dataTrain,"y");
+
+  yPred = predict(mdl,dataTest);
+  mdlMSE = loss(mdl,dataTest)
+  ```
+
+  ```matlab
+  mdl = fitrgp(dataTrain,"y");
+  [yPred,~,yInt] = predict(mdl,dataTest);
+  ```
