@@ -12,6 +12,8 @@ Author: Zhaojiacheng Zhou
 2. Linear Models
 3. Stepwise Linear Regression
 4. Regularized Linear Models
+5. SVMs, Trees and Neural Networks
+6. Gaussian Process Regression
 
 ---
 
@@ -398,4 +400,85 @@ Author: Zhaojiacheng Zhou
     yPred = dataNew*b + fitInfo.Intercept
     ```
 
+  - Sample Code
+
+    ```matlab
+    lambda = (0:100)/length(yTrain);
+    [b,fitInfo] = lasso(XTrain,yTrain,"Lambda",lambda,"Alpha",0.4);
+    plot(lambda,[fitInfo.Intercept;b],"LineWidth",2)
+    legend("intercept","X1","X2")
+    xlabel("\lambda")
+    yPred = fitInfo.Intercept + XTest*b;
+    mdlMSE = mean((yTest - yPred).^2);
+    [minMSE,idx] = min(mdlMSE)
+
+    plot(lambda,mdlMSE)
+    xlabel("\lambda")
+    ylabel("MSE")
+    ```
+
+  - Sample Code
+
+    ```matlab
+    lambdaR = 0:300;
+    bR = ridge(econTrain,XTrain,lambdaR,0);
+    econPredR = bR(1,:) + XTest*bR(2:end,:);
+    err = econPredR - econTest;
+    MSER = mean(err.^2);
+    [minMSER,idxR] = min(MSER)
+
+    plot(lambdaR,MSER)
+    xlabel("\lambda")
+    ylabel("MSE")
+    title("Ridge model")
+    lambdaL = (0:300)/length(econTrain);
+    [bL,fitInfo] = lasso(XTrain,econTrain,"Lambda",lambdaL);
+    econPredL = fitInfo.Intercept + XTest*bL;
+    err = econPredL - econTest;
+    MSEL = mean(err.^2);
+    [minMSEL,idxL] = min(MSEL)
+
+    plot(lambdaL,MSEL)
+    xlabel("\lambda")
+    ylabel("MSE")
+    title("Lasso model")
+    ```
+
+---
+
+### SVMs, Trees and Neural Networks
+
+- Intro
+
+  像`fitlm`这样的线性回归技术是参数化的，这意味着预测是基于从训练数据中估计的有限参数集。
+
+  参数回归模型特征:
+
+  - 假设可以使用公式指定的关系。  
+  - 很容易解释-你可以在预测因子中测量每单位变化的对应值变化
+
+  如果模型的主要目的只是预测未知观测结果的对应值，则可能不需要具有特定可解释公式的模型。在这种情况下，您可以使用非参数模型。
+
+  非参数回归模型:
+
+  - 不适合基于给定公式的回归模型。
+  - 可以提供更准确的预测，但更难以解释
+
+  支持向量机(svm)、决策树和神经网络是一些可以用于回归的非参数技术。
+
+- Grammar
+
+  与fit___一致
+
+---
+
+### Gaussian Process Regression
+
+- Intro
+
+  高斯过程回归(GPR)是另一种非参数回归技术。
+
+  除了预测给定预测值的响应值外，GPR模型还可选择返回标准偏差和预测区间。
+
+  ![GPR_Intro](src/GPR_Intro.png)
 
