@@ -15,3 +15,6 @@
 !Summary/src/*.png
 !Summary/src/*.jpg
 !Summary/src/*.pdf
+!PlotData/
+!PlotData/*.md
+!PlotData/*.png
